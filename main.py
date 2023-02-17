@@ -20,10 +20,10 @@ ListNames = [
 def create_table(db):
 	cursor = db.cursor()
 	query = 'CREATE TABLE peoples (' \
-			'id INTEGER PRIMARY KEY, ' \
-			'full_name TEXT NOT NULL, ' \
-			'birth_day TEXT NOT NULL,' \
-			'gender INTEGER NOT NULL);'
+		'id INTEGER PRIMARY KEY, ' \
+		'full_name TEXT NOT NULL, ' \
+		'birth_day TEXT NOT NULL,' \
+		'gender INTEGER NOT NULL);'
 	try:
 		cursor.execute(query)
 		db.commit()
@@ -37,7 +37,7 @@ def add_write(db, full_name, birth_day, gender):
 	res = True
 	cursor = db.cursor()
 	query = "INSERT INTO peoples (id, full_name, birth_day, gender) " \
-			f"VALUES  (null, '{full_name}', '{birth_day}', {gender});"
+		f"VALUES  (null, '{full_name}', '{birth_day}', {gender});"
 	try:
 		cursor.execute(query)
 		db.commit()
@@ -48,9 +48,9 @@ def add_write(db, full_name, birth_day, gender):
 	return res
 
 
-def print_data(db, filter=False):
+def print_data(db, filter_mark=False):
 	cursor = db.cursor()
-	if not filter:
+	if not filter_mark:
 		query = "SELECT DISTINCT (full_name || ' ' || birth_day), full_name, birth_day,  gender " \
 				"FROM peoples ORDER BY full_name;"
 	else:
@@ -66,28 +66,14 @@ def print_data(db, filter=False):
 	except sqlite3.Error as error:
 		print("Ошибка при запросе данных из таблицы:", error)
 
-	if records:
-		for line in records:
-			full_year = relativedelta(datetime.now(), datetime.strptime(line[2], '%Y-%m-%d')).years
-			print(line[1], line[2], 'Муж.' if line[3] else 'Жен.', full_year)
-	if filter:
+	if filter_mark:
 		print('Время выполнения SQL запроса:', round(load_time, 3), 'сек.')
-	cursor.close()
+	else:
+		if records:
+			for line in records:
+				full_year = relativedelta(datetime.now(), datetime.strptime(line[2], '%Y-%m-%d')).years
+				print(line[1], line[2], 'Муж.' if line[3] else 'Жен.', full_year)
 
-
-def print_data_male(db):
-	cursor = db.cursor()
-	query = "SELECT * FROM peoples WHERE gender = 1 AND full_name LIKE 'Ф%';"
-	records = None
-	try:
-		cursor.execute(query)
-		records = cursor.fetchall()
-	except sqlite3.Error as error:
-		print("Ошибка при запросе данных из таблицы:", error)
-
-	if records:
-		for line in records:
-			print(line[1], line[2], 'Муж.' if line[3] else 'Жен.')
 	cursor.close()
 
 
@@ -123,7 +109,7 @@ def main():
 		case '3':
 			print_data(db)
 		case '4':
-			for _ in range(1000):
+			for _ in range(1000000):
 				if not add_write(db, *get_rand_person()):
 					break
 			print('Рандомное заполнение таблицы завершено!')
@@ -135,5 +121,3 @@ def main():
 
 if __name__ == '__main__':
 	main()
-
-
